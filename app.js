@@ -25,5 +25,3 @@ app.get("/download", async (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
-
-// 0.tcp.ap.ngrok.io:10620/download
