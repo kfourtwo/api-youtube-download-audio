@@ -5,15 +5,21 @@ const path = require("path");
 const fs = require("fs");
 const ytdl = require("ytdl-core");
 
-const audioFilePath = path.join(__dirname, "audio");
+function sanitizeFileName(fileName) {
+  const invalidChars = /[\\/:"*?<>|'’‘]/g;
+  return fileName.replace(invalidChars, " ");
+}
 
-app.get("/download", async (req, res) => {
-  const videoUrl = "https://www.youtube.com/watch?v=CuYd_pVeRtg";
+app.get("/download-audio", async (req, res) => {
+  const videoUrl = req.query.url;
+  if (!videoUrl || !ytdl.validateURL(videoUrl)) {
+    return res.status(400).send("URL không hợp lệ");
+  }
   const videoInfo = await ytdl.getInfo(videoUrl);
   const audioFormat = videoInfo.formats.find((format) =>
     format.mimeType.includes("audio/mp4")
   );
-  const fileName = encodeURI(videoInfo.videoDetails.title);
+  const fileName = encodeURI(sanitizeFileName(videoInfo.videoDetails.title));
 
   res.header("Content-Disposition", `attachment; filename="${fileName}.m4a"`);
 
